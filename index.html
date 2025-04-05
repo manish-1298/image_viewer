@@ -1,0 +1,126 @@
+<html>
+<head>
+	<title>Load Images with Serial Numbers</title>
+	<style>
+		/* Style for images and serial numbers */	
+
+        .page-layout{
+            width: 60%;
+            margin: auto;
+        }
+
+        .container{
+            display: grid;
+            max-width: 80%;
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: repeat(1fr);
+            grid-row-gap: 1rem;
+        }
+
+        .box{
+            border: 0.7px solid grey;
+            padding: 15px;
+            overflow-wrap: break-word;
+            max-width: 80%;
+        }
+
+        .box img{
+            height: auto;
+            width: 100%;
+            margin: auto;
+            max-height: -webkit-fill-available;
+        }
+
+        .box video{
+            height: auto;
+            width: 100%;
+            margin: auto;
+            max-height: -webkit-fill-available;
+        }
+
+
+
+		@media(max-width: 1000px){
+			img{
+				height: 312px;
+            	width:auto;
+			}
+		}	
+		@media(max-width: 850px){
+			img{
+				height: 250px;
+            	width:auto;
+			}
+			
+		}
+		@media(max-width: 715px){
+			img{
+				height: 200px;
+            	width:auto;
+			}
+			
+		}
+
+
+
+	</style>
+</head>
+<body>
+	<label for="imageList">Enter the list of image URLs separated by space:</label><br>
+	<input type="text" id="imageList"><br><br>
+	<button onclick="loadImages()">Load Images</button>
+
+    <div class="page-layout">
+        <div class="container">
+            <div id="image-container"></div>
+        </div>
+    </div>
+
+	<script>
+		function loadImages() {
+			// Get the image list from the input field
+			var imageList = document.getElementById("imageList").value;
+
+			// Split the list into an array
+			var images = imageList.split(" ");
+
+			// Clear the image container
+			document.getElementById("image-container").innerHTML = "";
+
+			// Loop through the array and display images with serial numbers
+			for (var i = 0; i < images.length; i++) {
+				// Create image element
+				var img = document.createElement("img");
+				img.src = images[i];
+				
+				const p = document.createElement("p");
+				const node = document.createTextNode("Link: " + images[i].toString());
+				p.appendChild(node);
+
+				// Create serial number element
+				var serial = document.createElement("div");
+				serial.className = "serial";
+				serial.textContent = "Image " + (i + 1);
+
+                //Create textarea:
+                var textInput = document.createElement("textarea")
+                textInput.ATTRIBUTE_NODE = 'name="instapic" id="instapic" cols="40" rows="10"'
+                textInput.name = "For Writing Purpose";
+                textInput.cols = 80;
+                textInput.rows = 7;
+
+				// Create container element for the image and serial number
+				var container = document.createElement("div");
+				container.appendChild(img);
+				container.appendChild(serial);
+				container.appendChild(p);
+                container.appendChild(textInput);
+                container.className = "box";                
+
+				// Add the container to the image container on the web page
+				document.getElementById("image-container").appendChild(container);
+			}
+		}
+	</script>
+</body>
+</html>
