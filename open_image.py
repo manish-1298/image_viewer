@@ -4,7 +4,7 @@ from io import BytesIO
 from PIL import Image
 import base64
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 
 def fetch_image(url):
     try:
