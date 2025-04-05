@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 10px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .form-container {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 50%;
+      min-width: 300px;
+    }
+
+    textarea {
+      width: 75%;
+      height: 50px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      resize: none;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .image-container {
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      margin: 0 auto 10px auto;
+      width: 100%;
+      max-width: 600px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .image-number {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: #333;
+      width: 100%;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+      background: white;
+    }
+
+    .url-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin-top: 5px;
+      gap: 5px;
+    }
+
+    .url-text {
+      font-size: 12px;
+      color: #555;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      margin: 0;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+    }
+
+    .copy-btn {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #555;
+      transition: all 0.2s;
+      min-width: 60px;
+      height: 26px;
+    }
+
+    .copy-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .copy-btn:active {
+      background: #d0d0d0;
+    }
+
+    /* Scroll to Top Button Styling */
+    #scrollTopWrapper {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .scroll-icon {
+        background-color: #00aaff;
+        color: white;
+        font-size: 36px;         /* Increased size */
+        font-weight: 900;        /* Made thicker */
+        font-family: monospace;  /* Optional: for a consistent arrow shape */
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .scroll-icon:hover {
+      background-color: #0077cc;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+    }
+
+    .scroll-text {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #007BFF;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Enter Image URLs</h1>
+  <div class="form-container">
+    <form id="imageForm" style="display: flex; width: 100%; align-items: center;">
+      <textarea id="urls" placeholder="Enter each image URL on a new line"></textarea>
+      <button type="submit">Load Images</button>
+    </form>
+  </div>
+  <hr />
+  <div id="imageGallery">
+    {% for img_data, url, idx in images %}
+    <div class="image-container">
+      <div class="image-number">Image {{ idx }}</div>
+      <img src="data:image/png;base64,{{ img_data }}" alt="Image" />
+      <div class="url-row">
+        <p class="url-text" title="{{ url }}">{{ url }}</p>
+        <button class="copy-btn" onclick="copyToClipboard(this, '{{ url }}')">Copy</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <div id="scrollTopWrapper" onclick="scrollToTop()">
+    <div class="scroll-icon">↑</div>
+    <div class="scroll-text">Back to Top</div>
+  </div>
+
+  <script>
+    // Copy URL function
+    function copyToClipboard(button, url) {
+      navigator.clipboard.writeText(url).then(() => {
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = "Copy";
+        }, 1500);
+      });
+    }
+
+    // Form submission
+    document.getElementById("imageForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const urls = document.getElementById("urls").value.split("\n");
+      const gallery = document.getElementById("imageGallery");
+      gallery.innerHTML = "";
+
+      urls.forEach((url, index) => {
+        url = url.trim();
+        if (url) {
+          const container = document.createElement("div");
+          container.className = "image-container";
+
+          const number = document.createElement("div");
+          number.className = "image-number";
+          number.textContent = `Image ${index + 1}`;
+
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = "Image";
+
+          const urlRow = document.createElement("div");
+          urlRow.className = "url-row";
+
+          const caption = document.createElement("p");
+          caption.className = "url-text";
+          caption.textContent = url;
+          caption.title = url;
+
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "copy-btn";
+          copyBtn.textContent = "Copy";
+          copyBtn.onclick = () => copyToClipboard(copyBtn, url);
+
+          urlRow.appendChild(caption);
+          urlRow.appendChild(copyBtn);
+
+          container.appendChild(number);
+          container.appendChild(img);
+          container.appendChild(urlRow);
+          gallery.appendChild(container);
+        }
+      });
+    });
+
+    // Show scroll-to-top button
+    window.onscroll = function () {
+      const btnWrapper = document.getElementById("scrollTopWrapper");
+      btnWrapper.style.display =
+        document.body.scrollTop > 100 || document.documentElement.scrollTop > 100
+          ? "flex"
+          : "none";
+    };
+
+    // Scroll to top smoothly
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
